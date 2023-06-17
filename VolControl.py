@@ -10,6 +10,8 @@ wCam, hCam = 1280, 720
 ###################################################
 i=0
 
+vol=0
+
 #time set up for fps
 pTime = 0
 cTime = 0
@@ -22,11 +24,11 @@ detector = HandDetector(detectionConf=0.7)
 
 def lengthToVolume(length):
     #len ranges from 20 to 400
-    if ((length-20)/380) * 100 > 100:
+    if ((length-30)/350) * 100 > 100:
         return 100
-    elif ((length-20)/380) * 100 < 0:
+    elif ((length-30)/350) * 100 < 0:
         return 0
-    return ((length-20)/380) * 100
+    return ((length-30)/350) * 100
 
 while 1:
     success, img = cap.read()
@@ -49,11 +51,17 @@ while 1:
         length = hypot((lmList[8][1] - lmList[4][1]), (lmList[8][2] - lmList[4][2]))
         vol = int(lengthToVolume(length))
 
-        if length<50:
+        if length<30:
             cv2.circle(img, (cx, cy), 5, (0, 0, 255), cv2.FILLED)
         
         volScript = 'set volume output volume ' + str(vol)
         script = "osascript -e \'" + volScript + "\'"
+
+    slider_height = 80+((100-vol)*5)
+    cv2.rectangle(img, (10, 80), (110, 580), (0,0,0), 2)
+    cv2.rectangle(img, (10, slider_height), (110, 580), (0,255,0), cv2.FILLED)
+    if vol == 0:
+        cv2.line(img, (13, slider_height), (108, slider_height), (0,0,255), 5)
 
     if i == 5:
         if len(lmList) != 0:
